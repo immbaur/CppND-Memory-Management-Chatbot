@@ -27,7 +27,9 @@ bool ChatBotApp::OnInit()
 
 // wxWidgets FRAME
 ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(width, height))
-{
+{   
+    std::cout << "ChatBotFrame Constructor" << std::endl;
+
     // create panel with background image
     ChatBotFrameImagePanel *ctrlPanel = new ChatBotFrameImagePanel(this);
 
@@ -48,6 +50,21 @@ ChatBotFrame::ChatBotFrame(const wxString &title) : wxFrame(NULL, wxID_ANY, titl
 
     // position window in screen center
     this->Centre();
+}
+
+//new code
+ChatBotFrame::~ChatBotFrame(){
+    std::cout << "ChatBotFrame Destructor" << std::endl;
+
+    if(_panelDialog != nullptr){
+        delete _panelDialog;
+        _panelDialog = nullptr;
+    }
+    if(_userTextCtrl != nullptr){
+        delete _userTextCtrl;
+        _userTextCtrl = nullptr;
+    }
+
 }
 
 void ChatBotFrame::OnEnter(wxCommandEvent &WXUNUSED(event))
@@ -107,6 +124,8 @@ END_EVENT_TABLE()
 ChatBotPanelDialog::ChatBotPanelDialog(wxWindow *parent, wxWindowID id)
     : wxScrolledWindow(parent, id)
 {
+    std::cout << "ChatBotPanelDialog Constructor" << std::endl;
+
     // sizer will take care of determining the needed scroll size
     _dialogSizer = new wxBoxSizer(wxVERTICAL);
     this->SetSizer(_dialogSizer);
@@ -118,13 +137,22 @@ ChatBotPanelDialog::ChatBotPanelDialog(wxWindow *parent, wxWindowID id)
     ////
 
     // create chat logic instance
-    _chatLogic = new ChatLogic(); 
+    // _chatLogic = new ChatLogic();
+    _chatLogic = std::make_unique<ChatLogic>(); 
+    std::cout << "ChatLogic: " << _chatLogic.get() << std::endl;
+    std::cout << "ChatLogic ref: " << &_chatLogic << std::endl;
+
+    //std::cout << "ChatLogic initilized" << std::endl;
 
     // pass pointer to chatbot dialog so answers can be displayed in GUI
     _chatLogic->SetPanelDialogHandle(this);
 
+    //std::cout << "PanelDialogHandle set" << std::endl;
+
     // load answer graph from file
     _chatLogic->LoadAnswerGraphFromFile(dataPath + "src/answergraph.txt");
+
+    //std::cout << "AnswerGraphFromFile loaded" << std::endl;
 
     ////
     //// EOF STUDENT CODE
@@ -135,8 +163,12 @@ ChatBotPanelDialog::~ChatBotPanelDialog()
     //// STUDENT CODE
     ////
 
-    delete _chatLogic;
+    std::cout << "ChatBotPanelDialog Destructor" << std::endl;
 
+ //   if(_chatLogic != nullptr){ //new
+ //       delete _chatLogic;
+ //       _chatLogic = nullptr; //new
+ //   }
     ////
     //// EOF STUDENT CODE
 }
